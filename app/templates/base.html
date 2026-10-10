@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Notes App - TP1 DevSecOps</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; }
+    nav a { margin-right: 1rem; }
+    .note { border: 1px solid #ccc; border-radius: 6px; padding: .5rem 1rem; margin: .5rem 0; }
+    .error { color: #b00020; }
+    pre { background: #f4f4f4; padding: 1rem; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <nav>
+    {% if session.get('username') %}
+      Connecte : <b>{{ session['username'] }}</b> |
+      <a href="{{ url_for('index') }}">Mes notes</a>
+      <a href="{{ url_for('preferences') }}">Preferences</a>
+      <a href="{{ url_for('logout') }}">Deconnexion</a>
+    {% else %}
+      <a href="{{ url_for('login') }}">Connexion</a>
+      <a href="{{ url_for('register') }}">Inscription</a>
+    {% endif %}
+  </nav>
+  <hr>
+  {% block content %}{% endblock %}
+</body>
+</html>

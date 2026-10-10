@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.db
+.venv/
+venv/
+.env
+.idea/
+.vscode/
+# Dossier de travail temporaire des scanners
+reports/**/tmp/

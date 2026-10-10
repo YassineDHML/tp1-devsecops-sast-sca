@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Preferences</h1>
+<p>Theme actuel : <b>{{ prefs['theme'] }}</b></p>
+<form method="post">
+  <select name="theme">
+    <option value="light">Clair</option>
+    <option value="dark">Sombre</option>
+  </select>
+  <button type="submit">Enregistrer</button>
+</form>
+{% endblock %}

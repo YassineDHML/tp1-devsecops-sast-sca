@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Mes notes</h1>
+
+<form method="get" action="{{ url_for('search') }}">
+  <input name="q" placeholder="Rechercher un titre">
+  <button type="submit">Rechercher</button>
+</form>
+{% if message %}<p>{{ message }}</p>{% endif %}
+
+{% for note in notes %}
+  <div class="note"><h3>{{ note['title'] }}</h3><p>{{ note['content'] }}</p></div>
+{% else %}
+  <p>Aucune note.</p>
+{% endfor %}
+
+<h2>Nouvelle note</h2>
+<form method="post" action="{{ url_for('add_note') }}">
+  <p><input name="title" placeholder="Titre" required></p>
+  <p><textarea name="content" placeholder="Contenu" required></textarea></p>
+  <p><button type="submit">Ajouter</button></p>
+</form>
+
+<h2>Importer des notes (YAML)</h2>
+<form method="post" action="{{ url_for('import_notes') }}" enctype="multipart/form-data">
+  <input type="file" name="file" accept=".yml,.yaml" required>
+  <button type="submit">Importer</button>
+</form>
+{% endblock %}
