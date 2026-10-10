@@ -1,0 +1,80 @@
+# Shift-left : les scans SAST et SCA s'executent a chaque push / pull request.
+# Le pipeline echoue si une vulnerabilite significative est introduite.
+name: Security (SAST + SCA)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sast-bandit:
+    name: SAST - Bandit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - run: pip install bandit
+      - name: Bandit (echec si severite >= Medium)
+        run: bandit -r app --severity-level medium
+      - name: Rapport HTML
+        if: always()
+        run: bandit -r app -f html -o bandit-report.html || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: bandit-report
+          path: bandit-report.html
+
+  sca-pip-audit:
+    name: SCA - pip-audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - run: pip install pip-audit
+      - name: pip-audit (echec si une vulnerabilite connue est trouvee)
+        run: pip-audit -r requirements.txt --no-deps --disable-pip
+
+  sca-dependency-check:
+    name: SCA - OWASP Dependency-Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Cache de la base NVD
+        uses: actions/cache@v6
+        with:
+          path: ~/dc-data
+          key: dc-data-${{ github.run_id }}
+          restore-keys: dc-data-
+      - name: Dependency-Check (echec si CVSS >= 7)
+        run: |
+          mkdir -p ~/dc-data dc-report && chmod -R 777 ~/dc-data dc-report
+          docker run --rm \
+            -v "$PWD:/src" -v "$HOME/dc-data:/usr/share/dependency-check/data" \
+            owasp/dependency-check:latest \
+            --project "TP1 Notes App" --scan /src \
+            --exclude "**/reports/**" --exclude "**/.git/**" --exclude "**/dc-report/**" \
+            --enableExperimental --disableOssIndex \
+            --nvdDatafeed "https://dependency-check.github.io/DependencyCheck_Builder/nvd_cache/" \
+            --format HTML --format JSON --out /src/dc-report --failOnCVSS 7
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: dependency-check-report
+          path: dc-report/
+
+  docker-build:
+    name: Build de l'image Docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: docker build -t notes-app:ci .

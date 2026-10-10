@@ -8,3 +8,5 @@ venv/
 .vscode/
 # Dossier de travail temporaire des scanners
 reports/**/tmp/
+# Rapports generes pendant la demonstration (scripts/scan.ps1)
+reports/demo/
