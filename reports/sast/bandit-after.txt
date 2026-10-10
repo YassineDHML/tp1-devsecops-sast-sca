@@ -1,0 +1,43 @@
+Run started:2026-10-10 15:25:25.311185+00:00
+
+Test results:
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: app/app.py:14:0
+13	import sqlite3
+14	import subprocess
+15	from urllib.parse import urlparse
+
+--------------------------------------------------
+>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: app/app.py:241:13
+240	        abort(400, "Adresse IP invalide")
+241	    result = subprocess.run(
+242	        ["/bin/ping", "-c", "1", str(ip)], capture_output=True, timeout=5, check=False
+243	    )
+244	    output = (result.stdout + result.stderr).decode(errors="replace")
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 209
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 2
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 0
+		High: 2
+Files skipped (0):

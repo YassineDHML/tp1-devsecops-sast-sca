@@ -1,0 +1,175 @@
+Run started:2026-10-10 15:20:22.869148+00:00
+
+Test results:
+>> Issue: [B403:blacklist] Consider possible security implications associated with pickle module.
+   Severity: Low   Confidence: High
+   CWE: CWE-502 (https://cwe.mitre.org/data/definitions/502.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b403-import-pickle
+   Location: app/app.py:11:0
+10	import os
+11	import pickle
+12	import sqlite3
+
+--------------------------------------------------
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: app/app.py:13:0
+12	import sqlite3
+13	import subprocess
+14	
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 's3cr3t-k3y-tp1-devsecops'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: app/app.py:24:17
+23	app = Flask(__name__)
+24	app.secret_key = "s3cr3t-k3y-tp1-devsecops"
+25	
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'admin123'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: app/app.py:26:17
+25	
+26	ADMIN_PASSWORD = "admin123"
+27	
+
+--------------------------------------------------
+>> Issue: [B324:hashlib] Use of weak MD5 hash for security. Consider usedforsecurity=False
+   Severity: High   Confidence: High
+   CWE: CWE-327 (https://cwe.mitre.org/data/definitions/327.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b324_hashlib.html
+   Location: app/app.py:47:11
+46	def hash_password(password):
+47	    return hashlib.md5(password.encode()).hexdigest()
+48	
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/app.py:102:16
+101	        password = request.form["password"]
+102	        query = "SELECT id, username FROM users WHERE username = '%s' AND password = '%s'" % (
+103	            username,
+104	            hash_password(password),
+105	        )
+106	        user = get_db().execute(query).fetchone()
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b608_hardcoded_sql_expressions.html
+   Location: app/app.py:152:10
+151	    q = request.args.get("q", "")
+152	    sql = "SELECT id, title, content FROM notes WHERE owner_id = %d AND title LIKE '%%%s%%'" % (
+153	        session["user_id"],
+154	        q,
+155	    )
+156	    notes = get_db().execute(sql).fetchall()
+
+--------------------------------------------------
+>> Issue: [B704:markupsafe_markup_xss] Potential XSS with ``markupsafe.Markup`` detected. Do not use ``Markup`` on untrusted data.
+   Severity: Medium   Confidence: High
+   CWE: CWE-79 (https://cwe.mitre.org/data/definitions/79.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b704_markupsafe_markup_xss.html
+   Location: app/app.py:157:14
+156	    notes = get_db().execute(sql).fetchall()
+157	    message = Markup("Resultats pour : <b>%s</b>" % q)
+158	    return render_template("index.html", notes=notes, message=message)
+
+--------------------------------------------------
+>> Issue: [B506:yaml_load] Use of unsafe yaml load. Allows instantiation of arbitrary objects. Consider yaml.safe_load().
+   Severity: Medium   Confidence: High
+   CWE: CWE-20 (https://cwe.mitre.org/data/definitions/20.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b506_yaml_load.html
+   Location: app/app.py:166:11
+165	        return redirect(url_for("login"))
+166	    data = yaml.load(request.files["file"].read())
+167	    db = get_db()
+
+--------------------------------------------------
+>> Issue: [B301:blacklist] Pickle and modules that wrap it can be unsafe when used to deserialize untrusted data, possible security issue.
+   Severity: Medium   Confidence: High
+   CWE: CWE-502 (https://cwe.mitre.org/data/definitions/502.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b301-pickle
+   Location: app/app.py:189:16
+188	    if request.cookies.get("prefs"):
+189	        prefs = pickle.loads(base64.b64decode(request.cookies["prefs"]))
+190	    return render_template("preferences.html", prefs=prefs)
+
+--------------------------------------------------
+>> Issue: [B602:subprocess_popen_with_shell_equals_true] subprocess call with shell=True identified, security issue.
+   Severity: High   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b602_subprocess_popen_with_shell_equals_true.html
+   Location: app/app.py:199:13
+198	    host = request.args.get("host", "127.0.0.1")
+199	    output = subprocess.check_output("ping -c 1 " + host, shell=True, stderr=subprocess.STDOUT)
+200	    return render_template("tool.html", title="Ping", output=output.decode(errors="replace"))
+
+--------------------------------------------------
+>> Issue: [B501:request_with_no_cert_validation] Call to requests with verify=False disabling SSL certificate checks, security issue.
+   Severity: High   Confidence: High
+   CWE: CWE-295 (https://cwe.mitre.org/data/definitions/295.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b501_request_with_no_cert_validation.html
+   Location: app/app.py:206:11
+205	    url = request.args.get("url", "https://example.com")
+206	    resp = requests.get(url, verify=False)
+207	    return render_template("tool.html", title="Fetch", output=resp.text[:2000])
+
+--------------------------------------------------
+>> Issue: [B113:request_without_timeout] Call to requests without timeout
+   Severity: Medium   Confidence: Low
+   CWE: CWE-400 (https://cwe.mitre.org/data/definitions/400.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b113_request_without_timeout.html
+   Location: app/app.py:206:11
+205	    url = request.args.get("url", "https://example.com")
+206	    resp = requests.get(url, verify=False)
+207	    return render_template("tool.html", title="Fetch", output=resp.text[:2000])
+
+--------------------------------------------------
+>> Issue: [B201:flask_debug_true] A Flask app appears to be run with debug=True, which exposes the Werkzeug debugger and allows the execution of arbitrary code.
+   Severity: High   Confidence: Medium
+   CWE: CWE-94 (https://cwe.mitre.org/data/definitions/94.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b201_flask_debug_true.html
+   Location: app/app.py:213:4
+212	if __name__ == "__main__":
+213	    app.run(host="0.0.0.0", port=5000, debug=True)
+
+--------------------------------------------------
+>> Issue: [B104:hardcoded_bind_all_interfaces] Possible binding to all interfaces.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-605 (https://cwe.mitre.org/data/definitions/605.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b104_hardcoded_bind_all_interfaces.html
+   Location: app/app.py:213:17
+212	if __name__ == "__main__":
+213	    app.run(host="0.0.0.0", port=5000, debug=True)
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 162
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 4
+		Medium: 7
+		High: 4
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 3
+		Medium: 4
+		High: 8
+Files skipped (0):

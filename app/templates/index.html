@@ -6,7 +6,8 @@
   <input name="q" placeholder="Rechercher un titre">
   <button type="submit">Rechercher</button>
 </form>
-{% if message %}<p>{{ message }}</p>{% endif %}
+{# [SAST B704] La recherche est echappee automatiquement par Jinja2 (pas de Markup) #}
+{% if query %}<p>Resultats pour : <b>{{ query }}</b></p>{% endif %}
 
 {% for note in notes %}
   <div class="note"><h3>{{ note['title'] }}</h3><p>{{ note['content'] }}</p></div>
