@@ -10,3 +10,9 @@ venv/
 reports/**/tmp/
 # Rapports generes pendant la demonstration (scripts/scan.ps1)
 reports/demo/
+# Fichiers de compilation LaTeX (compte rendu)
+docs/compte-rendu/*.aux
+docs/compte-rendu/*.log
+docs/compte-rendu/*.toc
+docs/compte-rendu/*.out
+docs/compte-rendu/main.pdf

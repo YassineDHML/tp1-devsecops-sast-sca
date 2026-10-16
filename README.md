@@ -4,6 +4,12 @@ Application de prise de notes (Python/Flask) utilisée pour le TP1 *Analyse stat
 
 Le rapport complet, avec les explications, les résultats et la démonstration, se trouve dans **[RAPPORT.md](RAPPORT.md)**.
 
+Le compte rendu au format PDF est [Compte_Rendu_TP1_DevSecOps.pdf](Compte_Rendu_TP1_DevSecOps.pdf). Sa source LaTeX est dans `docs/compte-rendu/` ; pour la recompiler :
+
+```powershell
+docker run --rm -v "${PWD}/docs/compte-rendu:/doc" -w /doc texlive/texlive:latest-medium sh -c "pdflatex main.tex && pdflatex main.tex"
+```
+
 | Version | Tag Git | Bandit (High/Med/Low) | Vulnérabilités des dépendances |
 |---|---|---|---|
 | Initiale (vulnérable) | `v1.0-vulnerable` | 4 / 7 / 4 | 47 (pip-audit), 4 CVE (Dependency-Check) |
