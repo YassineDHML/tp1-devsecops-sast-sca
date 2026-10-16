@@ -108,8 +108,6 @@
   {\large\bfseries Mohamed Dhia Medini}\\[0.05cm]
   {\large\bfseries Takoua Ayadi}
 
-  \vspace{0.8cm}
-  Encadré par : Mme Saloua \textsc{Ben Yahia}
 
   \vfill
   \rule{0.55\textwidth}{0.4pt}\\[0.3cm]
@@ -228,6 +226,15 @@ Dès le démarrage, les journaux du conteneur affichent un premier signal d'alar
 \code{Debugger is active!} (Figure~\ref{fig:vulnlogs}). Le débogueur interactif de Werkzeug est
 exposé sur toutes les interfaces.
 
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.92\textwidth]{t_vuln_logs.png}}
+\caption{Lancement de l'image initiale : le débogueur Werkzeug est actif.}
+\label{fig:vulnlogs}
+\end{figure}
+
+
 \subsection{Organisation du dépôt Git}
 L'historique est découpé pour que chaque étape du TP soit visible et comparable :
 
@@ -301,6 +308,14 @@ query = "SELECT id, username FROM users WHERE username = '%s' AND password = '%s
 user = get_db().execute(query).fetchone()
 \end{lstlisting}
 
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.92\textwidth]{r_bandit_b608.png}}
+\caption{Rapport Bandit initial : injection SQL (B608) dans \code{/login}.}
+\label{fig:b608}
+\end{figure}
+
 \paragraph{Pourquoi c'est dangereux.} La saisie de l'utilisateur est insérée directement dans le
 texte de la requête SQL. Des caractères SQL (apostrophe, commentaire\ldots) peuvent alors
 \textbf{modifier la structure de la requête} au lieu d'être traités comme des données. Sur
@@ -337,6 +352,14 @@ host = request.args.get("host", "127.0.0.1")
 output = subprocess.check_output("ping -c 1 " + host, shell=True, stderr=subprocess.STDOUT)
 \end{lstlisting}
 
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.92\textwidth]{r_bandit_b602.png}}
+\caption{Rapport Bandit initial : injection de commande (B602, sévérité High).}
+\label{fig:b602}
+\end{figure}
+
 \paragraph{Pourquoi c'est dangereux.} Avec \code{shell=True}, la chaîne est interprétée par
 \code{/bin/sh}. Les métacaractères du shell (\code{;}, \code{\&\&}, \code{|}\ldots) présents dans
 \code{host} permettent d'enchaîner \textbf{n'importe quelle commande} sur le serveur. Dans
@@ -369,6 +392,14 @@ def ping():
         \textbf{non-root}.
 \end{enumerate}
 
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.7\textwidth,trim=0 290 0 0,clip]{a_secure_ping_400.png}}
+\caption{Outil ping avec une valeur qui n'est pas une adresse IP : requête refusée (HTTP 400).}
+\label{fig:ping400}
+\end{figure}
+
 \subsection{Autres vulnérabilités corrigées}
 \begin{table}[H]
 \centering
@@ -388,6 +419,14 @@ B201 / B104 & Débogueur Werkzeug exposé, qui permet d'exécuter du Python & \c
 \end{tabularx}
 \caption{Synthèse des autres corrections SAST}
 \end{table}
+
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.7\textwidth]{a_secure_search.png}}
+\caption{Recherche contenant du HTML : la saisie est affichée échappée (correction B704).}
+\label{fig:search}
+\end{figure}
 
 \subsection{Résultats après correction}
 \begin{table}[H]
@@ -414,6 +453,14 @@ Les \textbf{deux problèmes Low restants} (Figure~\ref{fig:banditafter}) ont ét
   \item \textbf{B603} (\code{subprocess} sans shell) : Bandit rappelle de vérifier les entrées.
         C'est fait : pas de shell, chemin absolu, argument validé par \code{ipaddress}.
 \end{itemize}
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.85\textwidth,trim=0 430 0 0,clip]{r_bandit-after.png}}
+\caption{Rapport Bandit après correction : seules restent les deux alertes Low B404 et B603.}
+\label{fig:banditafter}
+\end{figure}
+
 Ces lignes n'ont volontairement \textbf{pas} été masquées par \code{\# nosec}, par souci de
 transparence. En CI, le seuil de blocage est fixé à \emph{Medium}.
 
@@ -474,6 +521,22 @@ pip-audit & \code{requirements.txt} & \textbf{47 vulnérabilités} dans 9 paquet
 \end{tabularx}
 \caption{Résultats SCA sur la version initiale (Figures~\ref{fig:dcbefore} et~\ref{fig:dcimage})}
 \end{table}
+
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.85\textwidth,trim=0 0 600 0,clip]{r_dependency-check-before.png}}
+\caption{OWASP Dependency-Check sur \code{requirements.txt} (version initiale).}
+\label{fig:dcbefore}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.95\textwidth,trim=0 0 440 0,clip]{r_dependency-check-image-before.png}}
+\caption{OWASP Dependency-Check sur les paquets installés dans l'image initiale.}
+\label{fig:dcimage}
+\end{figure}
+
 
 \begin{table}[H]
 \centering
@@ -599,6 +662,14 @@ pip-audit & 47 vulnérabilités / 9 paquets & \textbf{0} \\
 \caption{SCA avant / après mise à jour (Figure~\ref{fig:dcafter})}
 \end{table}
 
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.6\textwidth,trim=0 0 1100 0,clip]{r_dependency-check-after.png}}
+\caption{OWASP Dependency-Check après mise à jour : aucune dépendance vulnérable.}
+\label{fig:dcafter}
+\end{figure}
+
 \subsection{Comparaison des outils SCA}
 \begin{itemize}
   \item \textbf{Dependency-Check sur \code{requirements.txt}} ne trouve que 4 CVE sur 2 paquets,
@@ -630,9 +701,38 @@ synthèse et enregistre les rapports.
   \item \textbf{Correctifs} : \code{git diff v1.0-vulnerable v2.0-secure} \code{-{}- app/app.py requirements.txt Dockerfile}.
   \item \textbf{Les scanners ne signalent plus les problèmes corrigés} :
         \code{.\textbackslash scripts\textbackslash scan.ps1 -Ref v2.0-secure} (Figure~\ref{fig:scanafter}).
-  \item \textbf{L'application corrigée fonctionne} (Figures~\ref{fig:notes} à~\ref{fig:ping400}) :
+  \item \textbf{L'application corrigée fonctionne} (Figures~\ref{fig:notes} et~\ref{fig:pingok}) :
         conteneur \code{healthy} exécuté par \code{appuser}, saisies invalides refusées (HTTP 400).
 \end{enumerate}
+
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.92\textwidth]{t_scan_before.png}}
+\caption{Script de démonstration sur la version initiale \code{v1.0-vulnerable}.}
+\label{fig:scanbefore}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.92\textwidth]{t_scan_after.png}}
+\caption{Script de démonstration sur la version corrigée \code{v2.0-secure}.}
+\label{fig:scanafter}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.7\textwidth]{a_secure_notes.png}}
+\caption{Application corrigée (\code{http://localhost:5002}) : connexion et notes.}
+\label{fig:notes}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.7\textwidth]{a_secure_ping_ok.png}}
+\caption{Outil ping avec une adresse IP valide.}
+\label{fig:pingok}
+\end{figure}
 
 \begin{table}[H]
 \centering
@@ -673,6 +773,21 @@ modification qui réintroduirait \code{shell=True} ou une version vulnérable de
 bloquée avant d'être fusionnée (Figure~\ref{fig:gate}). Sur la version corrigée, les quatre jobs
 réussissent (Figure~\ref{fig:ghrun}).
 
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.98\textwidth]{t_gate.png}}
+\caption{Porte de qualité SAST de la CI : échec sur la version initiale, succès sur la version corrigée.}
+\label{fig:gate}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.92\textwidth]{t_gh_run.png}}
+\caption{Exécution GitHub Actions réussie du pipeline \og Security (SAST + SCA) \fg.}
+\label{fig:ghrun}
+\end{figure}
+
 % ---------------------------------------------------------------------------
 \section{Conclusion}
 % ---------------------------------------------------------------------------
@@ -695,118 +810,7 @@ scan complet de l'image (Trivy), détection de secrets dans l'historique (gitlea
 dynamiques (DAST, OWASP ZAP).
 
 % ---------------------------------------------------------------------------
-\newpage
-\section*{Annexes -- Captures d'écran}
-\addcontentsline{toc}{section}{Annexes -- Captures d'écran}
-% ---------------------------------------------------------------------------
-
-\begin{figure}[H]
-\centering
-\fbox{\includegraphics[width=0.92\textwidth]{t_vuln_logs.png}}
-\caption{Lancement de l'image initiale : le débogueur Werkzeug est actif.}
-\label{fig:vulnlogs}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\fbox{\includegraphics[width=0.92\textwidth]{r_bandit_b608.png}}
-\caption{Rapport Bandit initial : injection SQL (B608) dans \code{/login}.}
-\label{fig:b608}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\fbox{\includegraphics[width=0.92\textwidth]{r_bandit_b602.png}}
-\caption{Rapport Bandit initial : injection de commande (B602, sévérité High).}
-\label{fig:b602}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\fbox{\includegraphics[width=0.85\textwidth,trim=0 430 0 0,clip]{r_bandit-after.png}}
-\caption{Rapport Bandit après correction : seules restent les deux alertes Low B404 et B603.}
-\label{fig:banditafter}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\fbox{\includegraphics[width=0.85\textwidth,trim=0 0 600 0,clip]{r_dependency-check-before.png}}
-\caption{OWASP Dependency-Check sur \code{requirements.txt} (version initiale).}
-\label{fig:dcbefore}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\fbox{\includegraphics[width=0.95\textwidth,trim=0 0 440 0,clip]{r_dependency-check-image-before.png}}
-\caption{OWASP Dependency-Check sur les paquets installés dans l'image initiale.}
-\label{fig:dcimage}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\fbox{\includegraphics[width=0.6\textwidth,trim=0 0 1100 0,clip]{r_dependency-check-after.png}}
-\caption{OWASP Dependency-Check après mise à jour : aucune dépendance vulnérable.}
-\label{fig:dcafter}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\fbox{\includegraphics[width=0.92\textwidth]{t_scan_before.png}}
-\caption{Script de démonstration sur la version initiale \code{v1.0-vulnerable}.}
-\label{fig:scanbefore}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\fbox{\includegraphics[width=0.92\textwidth]{t_scan_after.png}}
-\caption{Script de démonstration sur la version corrigée \code{v2.0-secure}.}
-\label{fig:scanafter}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\fbox{\includegraphics[width=0.7\textwidth]{a_secure_notes.png}}
-\caption{Application corrigée (\code{http://localhost:5002}) : connexion et notes.}
-\label{fig:notes}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\fbox{\includegraphics[width=0.7\textwidth]{a_secure_search.png}}
-\caption{Recherche contenant du HTML : la saisie est affichée échappée (correction B704).}
-\label{fig:search}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\fbox{\includegraphics[width=0.7\textwidth]{a_secure_ping_ok.png}}
-\caption{Outil ping avec une adresse IP valide.}
-\label{fig:pingok}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\fbox{\includegraphics[width=0.7\textwidth,trim=0 290 0 0,clip]{a_secure_ping_400.png}}
-\caption{Outil ping avec une valeur qui n'est pas une adresse IP : requête refusée (HTTP 400).}
-\label{fig:ping400}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\fbox{\includegraphics[width=0.98\textwidth]{t_gate.png}}
-\caption{Porte de qualité SAST de la CI : échec sur la version initiale, succès sur la version corrigée.}
-\label{fig:gate}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\fbox{\includegraphics[width=0.92\textwidth]{t_gh_run.png}}
-\caption{Exécution GitHub Actions réussie du pipeline \og Security (SAST + SCA) \fg.}
-\label{fig:ghrun}
-\end{figure}
-
-% ---------------------------------------------------------------------------
-\newpage
+\bigskip
 \section*{Annexe -- Détail des vulnérabilités des dépendances}\label{sec:cve}
 \addcontentsline{toc}{section}{Annexe -- Détail des vulnérabilités des dépendances}
 % ---------------------------------------------------------------------------
